@@ -4,6 +4,7 @@ import CourseCover from '../../components/CourseCover.astro';
 import CourseCard from '../../components/CourseCard.astro';
 import Faq from '../../components/Faq.astro';
 import Icon from '../../components/Icon.astro';
+import AuthorBlock from '../../components/AuthorBlock.astro';
 import { courses, stepikUrl, lessonCount, practiceLessons, contentLessons } from '../../data/courses';
 import { paths } from '../../data/paths';
 import { LEVEL_LABEL, STATUS_LABEL, type Course } from '../../data/types';
@@ -163,6 +164,13 @@ const ld: Record<string, unknown>[] = [
         <section class="block" aria-labelledby="req">
           <h2 class="h2 bh" id="req">Что нужно знать заранее</h2>
           <ul class="dashlist">{c.requirements.map((r) => <li>{r}</li>)}</ul>
+        </section>
+      )}
+
+      {c.status !== 'soon' && (
+        <section class="block" aria-labelledby="author-h">
+          <h2 class="h2 bh" id="author-h">Автор курса</h2>
+          <AuthorBlock variant="compact" />
         </section>
       )}
 

@@ -5,6 +5,7 @@ import Terminal from '../components/Terminal.astro';
 import CourseCard from '../components/CourseCard.astro';
 import TelegramBlock from '../components/TelegramBlock.astro';
 import Faq from '../components/Faq.astro';
+import AuthorBlock from '../components/AuthorBlock.astro';
 import { courses, getCourse, lessonCount, practiceLessons } from '../data/courses';
 import { paths } from '../data/paths';
 import { SITE } from '../data/site';
@@ -234,8 +235,13 @@ const ld = [
     </div>
   </section>
 
-  <!-- TELEGRAM -->
+  <!-- АВТОР -->
   <section class="section">
+    <div class="container"><AuthorBlock /></div>
+  </section>
+
+  <!-- TELEGRAM -->
+  <section class="section" style="padding-top:0">
     <div class="container"><TelegramBlock place="home" /></div>
   </section>
 
