@@ -5,7 +5,7 @@ import CourseCard from '../../components/CourseCard.astro';
 import Faq from '../../components/Faq.astro';
 import Icon from '../../components/Icon.astro';
 import AuthorBlock from '../../components/AuthorBlock.astro';
-import { courses, stepikUrl, lessonCount, practiceLessons, contentLessons } from '../../data/courses';
+import { courses, stepikUrl, lessonCount, practiceLessons, contentLessons, lessonKind } from '../../data/courses';
 import { paths } from '../../data/paths';
 import { LEVEL_LABEL, STATUS_LABEL, type Course } from '../../data/types';
 import { SITE } from '../../data/site';
@@ -120,8 +120,8 @@ const ld: Record<string, unknown>[] = [
                     </summary>
                     <ul class="lessons">
                       {m.lessons.map((l) => (
-                        <li class:list={[{ pr: /^(Практика|Итоговый практикум)/.test(l), qz: /^Квиз/.test(l) }]}>
-                          <span class="lk mono">{/^(Практика|Итоговый практикум)/.test(l) ? 'practice' : /^Квиз/.test(l) ? 'quiz' : 'lesson'}</span>
+                        <li class:list={[{ pr: lessonKind(l) === 'practice', qz: lessonKind(l) === 'quiz' }]}>
+                          <span class="mono lk">{lessonKind(l) === 'quiz' ? 'test' : lessonKind(l)}</span>
                           <span>{l}</span>
                         </li>
                       ))}
@@ -167,7 +167,7 @@ const ld: Record<string, unknown>[] = [
         </section>
       )}
 
-      {c.status !== 'soon' && (
+      {(
         <section class="block" aria-labelledby="author-h">
           <h2 class="h2 bh" id="author-h">Автор курса</h2>
           <AuthorBlock variant="compact" />
@@ -184,7 +184,7 @@ const ld: Record<string, unknown>[] = [
       <div class="card card--pad sticky">
         <p class="as-title">{c.shortTitle}</p>
         {c.price && <p class="as-price">{c.price}</p>}
-        <p class="muted small">{stepik ? 'Обучение, практика и тесты — на Stepik.' : 'Программа в разработке. Анонс — в Telegram.'}</p>
+        <p class="muted small">{stepik ? 'Обучение, практика и тесты — на Stepik.' : 'Запись скоро откроется. Анонс — в Telegram.'}</p>
         {stepik ? (
           <a class="btn btn--primary btn--block" href={stepik} target="_blank" rel="noopener" data-track="stepik" data-track-course={c.slug} data-track-place="aside">Перейти на Stepik <Icon name="external" /></a>
         ) : (
@@ -203,7 +203,7 @@ const ld: Record<string, unknown>[] = [
   <section class="section section--alt final-cta">
     <div class="container fc">
       <div>
-        <h2 class="h2">{stepik ? 'Готовы начать?' : 'Хотите узнать о старте первым?'}</h2>
+        <h2 class="h2">{stepik ? 'Готовы начать?' : 'Хотите узнать об открытии записи первым?'}</h2>
         <p class="lead">{stepik ? 'Откройте курс на Stepik: там полная программа, первые уроки и запись.' : `Анонс выйдет в Telegram-канале ${SITE.telegramHandle}.`}</p>
       </div>
       {stepik ? (

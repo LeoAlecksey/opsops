@@ -2,7 +2,7 @@
   "slug": "ansible-production",
   "stepikId": 295196,
   "status": "open",
-  "order": 3,
+  "order": 4,
   "featured": true,
   "title": "Ansible: паттерны и грабли продакшена (ansible-core 2.17+)",
   "shortTitle": "Ansible в продакшене",

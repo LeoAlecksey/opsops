@@ -38,9 +38,9 @@ scripts/og.mjs       ← генерация OG-картинок
 ## Как добавить курс
 
 1. Скопируйте любой файл из `src/data/courses/` под новым именем, например `linux-basics.json`.
-2. Заполните поля (`slug`, `stepikId`, `status`, программа в `modules` и т. д.). Схема — в `src/data/types.ts`.
+2. Заполните поля (`slug`, `stepikId`, при необходимости `stepikLink`, `status`, программа в `modules` и т. д.). Схема — в `src/data/types.ts`.
    - `status: "open"` — открыт для записи, кнопка ведёт на Stepik;
-   - `status: "soon"` — в разработке, кнопка ведёт в Telegram;
+   - `status: "soon"` — курс готовится или ещё не опубликован на Stepik: страница есть, кнопка ведёт в Telegram. Когда курс опубликован — поменяйте на `"open"`;
    - `status: "private"` — закрытый курс: страница есть, но ссылки-приглашения не публикуются.
 3. Если курс должен войти в маршрут — добавьте его в `src/data/paths.ts`.
 4. Обновите OG-картинки: `npm i -D playwright && npm run og` (один раз понадобится `npx playwright install chromium`).

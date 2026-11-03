@@ -2,7 +2,7 @@
   "slug": "proxmox-ve",
   "stepikId": 295198,
   "status": "open",
-  "order": 2,
+  "order": 3,
   "featured": true,
   "title": "Proxmox VE: эксплуатация, а не установка — HA, сеть, бэкапы",
   "shortTitle": "Proxmox VE",

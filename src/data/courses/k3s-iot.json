@@ -2,7 +2,7 @@
   "slug": "k3s-iot",
   "stepikId": 295180,
   "status": "open",
-  "order": 5,
+  "order": 6,
   "featured": true,
   "title": "K3s для IoT: кластер на нестандартном железе",
   "shortTitle": "K3s для IoT",

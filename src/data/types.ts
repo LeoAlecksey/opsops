@@ -13,7 +13,9 @@ export interface Course {
   slug: string;
   /** ID курса на Stepik (null — курс ещё не опубликован) */
   stepikId: number | null;
-  /** open — открыт для записи; soon — в разработке; private — закрытый, приглашения не публикуем */
+  /** Своя ссылка на Stepik (например короткая stepik.org/a/<id>); по умолчанию /course/<id>/promo */
+  stepikLink?: string;
+  /** open — открыт для записи; soon — готовится или ещё не опубликован на Stepik (ссылка на Stepik не показывается); private — закрытый, приглашения не публикуем */
   status: CourseStatus;
   /** Порядок в каталоге */
   order: number;
@@ -68,6 +70,6 @@ export const LEVEL_LABEL: Record<CourseLevel, string> = {
 
 export const STATUS_LABEL: Record<CourseStatus, string> = {
   open: 'Открыт для записи',
-  soon: 'В разработке',
+  soon: 'Скоро открытие',
   private: 'Закрытый курс',
 };

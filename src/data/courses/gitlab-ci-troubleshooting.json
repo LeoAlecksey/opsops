@@ -2,7 +2,7 @@
   "slug": "gitlab-ci-troubleshooting",
   "stepikId": 295197,
   "status": "open",
-  "order": 4,
+  "order": 5,
   "featured": true,
   "title": "GitLab CI: диагностика и починка пайплайнов — раннер, Kaniko",
   "shortTitle": "GitLab CI: диагностика",
