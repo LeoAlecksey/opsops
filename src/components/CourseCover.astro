@@ -1,0 +1,56 @@
+---
+import type { Course } from '../data/types';
+interface Props { course: Course; size?: 'card' | 'hero' }
+const { course, size = 'card' } = Astro.props;
+const accent = course.cover.accent;
+---
+<div class:list={['cover', `cover--${size}`]} style={`--ac: var(--${accent}); --ac-dim: var(--${accent}-dim);`} aria-hidden="true">
+  <div class="cover-grid"></div>
+  <div class="cover-top">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <span class="cat">{course.category.toLowerCase()}</span>
+  </div>
+  <div class="glyph">{course.cover.glyph}</div>
+  <div class="cover-bottom">
+    <span>{course.slug}</span>
+    {course.stepikId && <span>#{course.stepikId}</span>}
+  </div>
+</div>
+<style>
+  .cover {
+    position: relative; overflow: hidden;
+    aspect-ratio: 16 / 9;
+    border-radius: 11px;
+    background:
+      radial-gradient(120% 90% at 85% 10%, var(--ac-dim), transparent 60%),
+      linear-gradient(160deg, #121b25, #0c1218 70%);
+    border: 1px solid var(--line);
+    display: grid; grid-template-rows: auto 1fr auto;
+    padding: 14px 16px;
+    font-family: var(--mono);
+  }
+  .cover-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgb(148 178 208 / 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(148 178 208 / 0.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: linear-gradient(140deg, transparent 20%, #000 90%);
+  }
+  .cover-top, .cover-bottom { position: relative; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+  .dots { display: flex; gap: 5px; }
+  .dots i { width: 7px; height: 7px; border-radius: 50%; background: rgb(148 178 208 / 0.22); }
+  .dots i:first-child { background: var(--ac); opacity: 0.85; }
+  .cat { color: var(--ac); }
+  .glyph {
+    position: relative; align-self: center; justify-self: start;
+    font-size: clamp(28px, 3.4vw, 40px); font-weight: 600; letter-spacing: -0.02em;
+    color: var(--text);
+    text-shadow: 0 0 28px var(--ac-dim);
+  }
+  .glyph::after { content: ''; display: inline-block; width: 0.5em; height: 0.12em; margin-left: 0.15em; background: var(--ac); vertical-align: -0.05em; animation: blink 1.2s steps(1) infinite; }
+  .cover--hero .glyph { font-size: clamp(40px, 6vw, 64px); }
+  .cover--hero { padding: 20px 22px; }
+  .cover--hero .cover-top, .cover--hero .cover-bottom { font-size: 12.5px; }
+  @keyframes blink { 50% { opacity: 0; } }
+</style>

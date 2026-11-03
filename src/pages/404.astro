@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { url } from '../lib/url';
+---
+<Base title="Страница не найдена" description="Такой страницы нет. Перейдите в каталог курсов или на главную." noindex>
+  <section class="nf">
+    <div class="bg-grid"></div>
+    <div class="container inner">
+      <p class="code mono"><span class="accent">$</span> curl -I {Astro.url.pathname}<br/><span class="err">HTTP/2 404</span></p>
+      <h1 class="h1">Страница не найдена</h1>
+      <p class="lead">Возможно, адрес изменился. Курсы и маршруты — в каталоге.</p>
+      <div class="cta">
+        <a class="btn btn--primary" href={url('/courses/')}>Каталог курсов <Icon name="arrow" /></a>
+        <a class="btn" href={url('/')}>На главную</a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .nf { position: relative; overflow: hidden; padding-block: clamp(80px, 14vw, 160px); }
+  .inner { position: relative; z-index: 1; display: grid; gap: 20px; max-width: 720px; }
+  .code { font-size: 14px; color: var(--text-2); padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); width: fit-content; max-width: 100%; overflow-wrap: anywhere; }
+  .err { color: var(--danger); }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; }
+</style>

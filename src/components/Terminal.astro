@@ -1,0 +1,54 @@
+---
+/** Декоративный «терминал» в hero. Строки — реальные курсы каталога. */
+const rows = [
+  { st: 'ok', slug: 'start-in-it', note: 'linux · windows · сеть · мониторинг' },
+  { st: 'ok', slug: 'proxmox-ve', note: 'кворум · HA · PBS · ACL' },
+  { st: 'run', slug: 'ansible-production', note: 'strict mode · jinja2 · collections' },
+  { st: 'wait', slug: 'gitlab-ci', note: 'runner · docker-in-ci · kaniko' },
+  { st: 'wait', slug: 'k3s-iot', note: 'kube-vip · jetson · tolerations' },
+  { st: 'wait', slug: 'ai-devops', note: 'llm · rag · human-in-the-loop' },
+];
+const mark: Record<string, string> = { ok: '[ ok ]', run: '[ .. ]', wait: '[    ]' };
+---
+<div class="term" aria-hidden="true">
+  <div class="term-bar">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <span class="term-title">opsops — learning path</span>
+    <span></span>
+  </div>
+  <div class="term-body">
+    <p><span class="pr">~ $</span> opsops path <span class="fl">--from</span> basics <span class="fl">--to</span> production</p>
+    <p class="dim"># рекомендуемый порядок, проходится на Stepik</p>
+    {rows.map((r, i) => (
+      <p class="row" style={`--d:${i * 90 + 200}ms`}>
+        <span class:list={['st', r.st]}>{mark[r.st]}</span>
+        <span class="slug">{r.slug}</span>
+        <span class="note">{r.note}</span>
+      </p>
+    ))}
+    <p><span class="pr">~ $</span> <span class="cursor"></span></p>
+  </div>
+</div>
+<style>
+  .term { border: 1px solid var(--line-2); border-radius: 14px; background: linear-gradient(180deg, #0f161e, #0b1117); box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.02) inset; overflow: hidden; font-family: var(--mono); font-size: 13px; }
+  .term-bar { display: grid; grid-template-columns: 60px 1fr 60px; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--line); background: rgb(148 178 208 / 0.03); }
+  .dots { display: flex; gap: 6px; }
+  .dots i { width: 10px; height: 10px; border-radius: 50%; background: rgb(148 178 208 / 0.2); }
+  .term-title { text-align: center; color: var(--muted); font-size: 12px; }
+  .term-body { padding: 18px 18px 20px; display: grid; gap: 7px; color: var(--text-2); }
+  .term-body p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pr { color: var(--teal); }
+  .fl { color: var(--blue); }
+  .dim { color: var(--muted); }
+  .row { display: grid; grid-template-columns: 58px 160px 1fr; gap: 10px; opacity: 0; animation: in 0.5s ease forwards; animation-delay: var(--d); }
+  .st.ok { color: var(--green); }
+  .st.run { color: var(--amber); }
+  .st.wait { color: var(--muted); }
+  .slug { color: var(--text); }
+  .note { color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+  .cursor { display: inline-block; width: 8px; height: 15px; background: var(--teal); vertical-align: -2px; animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes in { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 520px) { .term { font-size: 11.5px; } .row { grid-template-columns: 50px 1fr; } .note { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .row { opacity: 1; } }
+</style>

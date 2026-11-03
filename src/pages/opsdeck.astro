@@ -1,0 +1,135 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { SITE } from '../data/site';
+import { url } from '../lib/url';
+
+// Все факты — из README репозитория LeoAlecksey/opsdeck (версия 0.8.4, проверено 03.11.2026).
+const features = [
+  { t: 'Терминал и AI-панель', d: 'Вкладки и сплиты, блоки команд с кодом выхода и временем, палитра команд, подсказки из истории. Рядом — CLI-ассистенты для кода, каждый в своём терминале.', img: 'terminal' },
+  { t: 'Локальный ИИ', d: 'llama.cpp, работает офлайн: модель от Qwen2.5-Coder 1.5B до более крупных, или свой сервер с OpenAI-совместимым API. Встроенные шпаргалки по 23 темам — в промпт идут проверенные команды.', img: 'ai' },
+  { t: 'AI-агент с правилами', d: 'Сам ходит на хост и разбирает проблему шаг за шагом. Уровни доступа на каждый хост, запрет перенаправлений и необратимых команд, журнал всех выполненных команд.', img: 'ai-chat' },
+  { t: 'Kubernetes', d: 'Собственное хранилище kubeconfig, живые таблицы, проблемы и небезопасные настройки, логи всех подов, Helm и Argo CD, режим только чтения для прода.', img: 'k8s' },
+  { t: 'Базы данных', d: 'PostgreSQL, MySQL/MariaDB, ClickHouse, Redis, MongoDB: дерево структуры, редактор запросов, экспорт в CSV/JSON, read-only для продовых баз.', img: 'db' },
+  { t: 'IDE и git', d: 'Редактор с подсветкой Terraform, YAML и других форматов, поиск по проекту, граф пайплайна для .gitlab-ci.yml и GitHub Actions, git-панель.', img: 'code' },
+  { t: 'Веб-панели и алерты', d: 'Grafana, ArgoCD, GitLab во вкладках с автологином. Опрос Grafana Alerting, Alertmanager, Zabbix 6.0+ без открытия портов наружу.', img: 'alerts' },
+  { t: 'Хосты и облака', d: 'SSH-профили, мониторинг хостов, файлы между хостами, Yandex Cloud через yc CLI, MikroTik, сетевые утилиты.', img: 'monitor' },
+];
+const os = [
+  { n: 'Linux', v: 'x64, ARM64 · Ubuntu 22.04+, Debian 12+, Fedora 36+, openSUSE Tumbleweed, Arch', f: '.deb · .rpm · .AppImage' },
+  { n: 'Windows', v: 'x64 · Windows 10 и 11', f: '.msi · .exe' },
+  { n: 'macOS', v: 'Intel 10.13+, Apple Silicon 11+ · сборки пока не подписаны', f: '.dmg' },
+];
+const stack = ['Rust', 'Tauri 2', 'TypeScript', 'Vite', 'xterm.js', 'kube-rs', 'llama.cpp'];
+const security = ['Секреты — только в системном хранилище, KeePass или Passbolt', 'Не слушает внешние интерфейсы: мост и приёмник — только 127.0.0.1 с токеном', 'Строгая CSP, экранирование внешних данных, Markdown через DOMPurify', 'npm audit, cargo audit, CodeQL и Dependabot в CI'];
+
+const ld = {
+  '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: 'OpsDeck',
+  applicationCategory: 'DeveloperApplication', operatingSystem: 'Linux, Windows, macOS',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'RUB' }, license: 'https://opensource.org/licenses/MIT',
+  url: SITE.opsdeckSite, codeRepository: SITE.opsdeckRepo,
+};
+---
+<Base title="OpsDeck — open-source рабочее место DevOps-инженера"
+  description="OpsDeck — нативное приложение для Linux, Windows и macOS: терминал с AI-панелью, локальная модель, AI-агент с правилами, Kubernetes, базы данных, SSH, алерты и заметки. Rust + Tauri 2, MIT."
+  image="/og/opsdeck.png" jsonLd={ld} keywords={['opsdeck', 'рабочее место devops', 'терминал с ии', 'kubernetes клиент', 'tauri']}>
+  <section class="od-hero">
+    <div class="bg-grid"></div>
+    <div class="container od-grid">
+      <div class="od-text">
+        <nav class="crumbs" aria-label="Хлебные крошки"><a href={url('/')}>главная</a><span aria-hidden="true">/</span><span>opsdeck</span></nav>
+        <div class="brand">
+          <img src={url('/images/opsdeck/icon.png')} alt="" width="56" height="56" />
+          <div><span class="eyebrow">Open-source · MIT</span><h1 class="h1">OpsDeck</h1></div>
+        </div>
+        <p class="lead big">Рабочее место DevOps-инженера в одном окне: терминал с AI-панелью и локальной моделью, AI-агент, который исследует хосты по вашим правилам, Kubernetes, базы данных, IDE с git, алерты, заметки, KeePass и Passbolt, SSH и мониторинг хостов.</p>
+        <p class="muted">Самостоятельный проект автора курсов. Он не входит в курсы и не нужен для их прохождения.</p>
+        <div class="cta">
+          <a class="btn btn--primary" href={`${SITE.opsdeckRepo}/releases`} target="_blank" rel="noopener" data-track="opsdeck" data-track-place="releases"><Icon name="download" /> Скачать в Releases</a>
+          <a class="btn" href={SITE.opsdeckRepo} target="_blank" rel="noopener" data-track="opsdeck" data-track-place="github"><Icon name="github" /> GitHub</a>
+          <a class="btn btn--ghost" href={SITE.opsdeckSite} target="_blank" rel="noopener" data-track="opsdeck" data-track-place="docs"><Icon name="book" /> Обзор и руководство</a>
+        </div>
+      </div>
+      <figure class="shot main-shot">
+        <img src={url('/images/opsdeck/terminal.webp')} alt="OpsDeck: терминал с блоками команд" width="1440" height="900" fetchpriority="high" />
+      </figure>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Возможности</span><h2 class="h2">Что умеет OpsDeck</h2></div>
+      <div class="features">
+        {features.map((f, i) => (
+          <article class:list={['feat', { rev: i % 2 === 1 }]}>
+            <div class="ft">
+              <span class="pk mono">{String(i + 1).padStart(2, '0')}</span>
+              <h3 class="h3">{f.t}</h3>
+              <p class="muted">{f.d}</p>
+            </div>
+            <figure class="shot"><img src={url(`/images/opsdeck/${f.img}.webp`)} alt={`OpsDeck: ${f.t}`} width="1440" height="900" loading="lazy" decoding="async" /></figure>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container grid grid-2 info">
+      <div class="card card--pad">
+        <h2 class="h3 ih">Поддерживаемые системы</h2>
+        <ul class="os">
+          {os.map((o) => <li><strong>{o.n}</strong><span class="muted">{o.v}</span><span class="mono f">{o.f}</span></li>)}
+        </ul>
+        <p class="muted small">Интерфейс на русском и английском. Приложение обновляется само и проверяет подпись обновлений.</p>
+      </div>
+      <div class="grid">
+        <div class="card card--pad">
+          <h2 class="h3 ih">Технологии</h2>
+          <div class="chips">{stack.map((s) => <span class="tag tag--mono">{s}</span>)}</div>
+        </div>
+        <div class="card card--pad">
+          <h2 class="h3 ih">Безопасность</h2>
+          <ul class="checklist">{security.map((s) => <li>{s}</li>)}</ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight">
+    <div class="container fc">
+      <div>
+        <h2 class="h2">Попробуйте OpsDeck</h2>
+        <p class="lead">Установщики для Linux, Windows и macOS — в разделе Releases на GitHub. Issues и pull requests приветствуются.</p>
+      </div>
+      <a class="btn btn--primary" href={`${SITE.opsdeckRepo}/releases`} target="_blank" rel="noopener" data-track="opsdeck" data-track-place="bottom">Открыть Releases <Icon name="external" /></a>
+    </div>
+  </section>
+</Base>
+<style>
+  .od-hero { position: relative; overflow: hidden; padding-block: clamp(44px, 7vw, 96px); border-bottom: 1px solid var(--line); }
+  .od-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1.2fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
+  .od-text { display: grid; gap: 18px; }
+  .brand { display: flex; gap: 16px; align-items: center; }
+  .brand img { border-radius: 14px; }
+  .brand > div { display: grid; gap: 6px; }
+  .big { font-size: clamp(17px, 1.5vw, 19px); }
+  .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .shot { margin: 0; border-radius: 12px; overflow: hidden; border: 1px solid var(--line-2); box-shadow: 0 30px 70px -36px rgb(0 0 0 / 0.9); background: var(--surface); }
+  .main-shot { box-shadow: 0 50px 100px -40px rgb(0 0 0 / 0.95), 0 0 0 1px rgb(45 212 191 / 0.08); }
+  @media (max-width: 960px) { .od-grid { grid-template-columns: 1fr; } }
+  .features { display: grid; gap: clamp(40px, 6vw, 80px); }
+  .feat { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(24px, 4vw, 56px); align-items: center; }
+  .feat.rev .ft { order: 2; }
+  .ft { display: grid; gap: 12px; }
+  .pk { font-size: 12px; color: var(--teal); }
+  @media (max-width: 860px) { .feat { grid-template-columns: 1fr; } .feat.rev .ft { order: 0; } }
+  .ih { margin-bottom: 16px; }
+  .os { list-style: none; display: grid; gap: 0; margin-bottom: 16px; }
+  .os li { display: grid; gap: 3px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .os .f { font-size: 12.5px; color: var(--teal); }
+  .small { font-size: 14px; }
+  .info { align-items: start; }
+  .fc { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; }
+  .fc > div { display: grid; gap: 10px; max-width: 640px; }
+</style>

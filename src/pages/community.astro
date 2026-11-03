@@ -1,0 +1,50 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import TelegramBlock from '../components/TelegramBlock.astro';
+import { SITE } from '../data/site';
+import { url } from '../lib/url';
+
+const formats = [
+  { t: 'Практические инструкции', d: 'Настройка и эксплуатация: как сделать и что проверить после.' },
+  { t: 'Разборы ошибок', d: 'Симптом, логи, причина и исправление — в том же формате, что и в курсах.' },
+  { t: 'Короткие советы и шпаргалки', d: 'Команды и приёмы, которые экономят время на дежурстве.' },
+  { t: 'Схемы инфраструктуры', d: 'Как связаны компоненты и где обычно ломается.' },
+  { t: 'OpsDeck', d: 'Новости релизов и демонстрации возможностей.' },
+  { t: 'Анонсы курсов', d: 'Только по делу: новые курсы и обновления программ.' },
+];
+---
+<Base title="Сообщество: Telegram-канал @sys_admin_expert"
+  description="Telegram-канал @sys_admin_expert: рабочие заметки по системному администрированию и DevOps, разборы ошибок, практические инструкции, новости OpsDeck и анонсы курсов.">
+  <section class="page-head">
+    <div class="bg-grid"></div>
+    <div class="container head">
+      <nav class="crumbs" aria-label="Хлебные крошки"><a href={url('/')}>главная</a><span aria-hidden="true">/</span><span>сообщество</span></nav>
+      <h1 class="h1">Сообщество инженеров</h1>
+      <p class="lead">Главное место для общения — Telegram-канал {SITE.telegramHandle}. Там выходят рабочие заметки, разборы и анонсы. Приоритет — полезный технический контент, а не реклама.</p>
+    </div>
+  </section>
+  <section class="section section--tight">
+    <div class="container"><TelegramBlock place="community" /></div>
+  </section>
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Форматы</span><h2 class="h2">Что публикуется в канале</h2></div>
+      <div class="grid grid-3">
+        {formats.map((f) => (
+          <div class="card card--pad fmt"><h3 class="h3">{f.t}</h3><p class="muted">{f.d}</p></div>
+        ))}
+      </div>
+      <div class="cta">
+        <a class="btn btn--primary" href={SITE.telegram} target="_blank" rel="noopener" data-track="telegram" data-track-place="community-bottom"><Icon name="telegram" /> Подписаться на {SITE.telegramHandle}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+<style>
+  .page-head { position: relative; padding-block: clamp(48px, 7vw, 88px) 12px; overflow: hidden; }
+  .head { position: relative; z-index: 1; display: grid; gap: 18px; }
+  .head .lead { max-width: 780px; }
+  .fmt { display: grid; gap: 10px; align-content: start; }
+  .cta { margin-top: 32px; }
+</style>

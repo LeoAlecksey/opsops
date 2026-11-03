@@ -1,0 +1,37 @@
+---
+import Icon from './Icon.astro';
+import { SITE } from '../data/site';
+interface Props { place?: string }
+const { place = 'block' } = Astro.props;
+const topics = ['Рабочие заметки по Linux и администрированию', 'Разборы инцидентов и ошибок', 'Практика DevOps: Ansible, CI/CD, Kubernetes', 'Новости OpsDeck и анонсы курсов'];
+---
+<div class="tg card">
+  <div class="bg-grid"></div>
+  <div class="tg-inner">
+    <div class="tg-text">
+      <span class="eyebrow">Сообщество</span>
+      <h2 class="h2">Telegram-канал {SITE.telegramHandle}</h2>
+      <p class="lead">Рабочие заметки по системному администрированию и DevOps. Полезно, даже если вы не проходите курсы, — анонсы здесь не главное.</p>
+      <div class="cta">
+        <a class="btn btn--primary" href={SITE.telegram} target="_blank" rel="noopener" data-track="telegram" data-track-place={place}>
+          <Icon name="telegram" /> Открыть канал
+        </a>
+      </div>
+    </div>
+    <ul class="tg-list">
+      {topics.map((t, i) => (
+        <li><span class="num mono">0{i + 1}</span><span>{t}</span></li>
+      ))}
+    </ul>
+  </div>
+</div>
+<style>
+  .tg { overflow: hidden; padding: clamp(24px, 4vw, 48px); background: radial-gradient(90% 120% at 0% 0%, rgb(45 212 191 / 0.08), transparent 55%), var(--surface); }
+  .tg-inner { position: relative; z-index: 1; display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center; }
+  .tg-text { display: grid; gap: 16px; }
+  .cta { margin-top: 8px; }
+  .tg-list { list-style: none; display: grid; gap: 10px; }
+  .tg-list li { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border: 1px solid var(--line); border-radius: 11px; background: rgb(10 14 19 / 0.45); color: var(--text-2); }
+  .num { color: var(--teal); font-size: 12.5px; }
+  @media (max-width: 860px) { .tg-inner { grid-template-columns: 1fr; } }
+</style>

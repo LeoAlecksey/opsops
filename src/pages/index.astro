@@ -1,0 +1,305 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Terminal from '../components/Terminal.astro';
+import CourseCard from '../components/CourseCard.astro';
+import TelegramBlock from '../components/TelegramBlock.astro';
+import Faq from '../components/Faq.astro';
+import { courses, getCourse, lessonCount, practiceLessons } from '../data/courses';
+import { paths } from '../data/paths';
+import { SITE } from '../data/site';
+import { url, plural } from '../lib/url';
+
+const open = courses.filter((c) => c.status === 'open');
+const soon = courses.filter((c) => c.status === 'soon');
+const totalLessons = open.reduce((n, c) => n + lessonCount(c), 0);
+const totalPractice = open.reduce((n, c) => n + practiceLessons(c).length, 0);
+
+const directions = [
+  { name: 'Старт в IT', icon: 'flag', text: 'Linux и Windows, сеть, виртуализация, работа поддержки изнутри.' },
+  { name: 'Виртуализация', icon: 'layers', text: 'Proxmox VE в проде: кворум и HA, сеть, хранилище, бэкапы.' },
+  { name: 'Автоматизация', icon: 'wrench', text: 'Ansible-роли и коллекции, которые не ломаются после апгрейда.' },
+  { name: 'CI/CD', icon: 'terminal', text: 'Диагностика GitLab CI: раннер, Docker-in-CI, артефакты, Kaniko.' },
+  { name: 'Kubernetes', icon: 'route', text: 'K3s на флоте устройств: ARM, Jetson и нестабильная сеть.' },
+  { name: 'ИИ в эксплуатации', icon: 'shield', text: 'LLM в инцидентах, IaC и CI/CD — с ограничениями и контролем.' },
+] as const;
+
+const pillars = [
+  { k: 'LEARN', t: 'Понимать', d: 'Как устроена система и почему она ломается именно так. Без зубрёжки — через путь запроса, механику кворума, поведение раннера.' },
+  { k: 'BUILD', t: 'Строить', d: 'Кластеры, роли, пайплайны и скрипты руками — на тестовых стендах, а не в тестах с четырьмя вариантами ответа.' },
+  { k: 'OPERATE', t: 'Эксплуатировать', d: 'Диагностика по чек-листу, бэкапы, которые восстанавливаются, и изменения, которые не роняют прод.' },
+];
+
+const reasons = [
+  { t: 'Из реальной эксплуатации', d: 'Курсы собраны из инцидентов и задач, с которыми автор сталкивался сам: Proxmox-кластеры, флот K3s, Ansible-роли в проде.' },
+  { t: '«Баг → диагностика → фикс»', d: 'Сначала симптом и логи, потом поиск причины, потом исправление, которое не всплывёт снова. Так выглядит настоящая работа.' },
+  { t: 'Практика в каждом модуле', d: `Во всех открытых курсах — ${totalPractice} практических занятий и финальные проекты: смоделированные инциденты, кластеры, пайплайны.` },
+  { t: 'Честно о границах', d: 'Никаких «войти в IT за месяц» и гарантий трудоустройства. Пишем, для кого курс подходит, а для кого нет.' },
+];
+
+const faq = [
+  { q: 'Где проходит обучение?', a: 'Все курсы размещены на Stepik: уроки, практические задания и тесты — там. На этом сайте — описания, программы и маршруты, чтобы выбрать подходящий курс.' },
+  { q: 'С какого курса начать, если опыта в IT нет?', a: 'С курса «Start в IT: путь в техподдержку и системное администрирование». Остальные курсы рассчитаны на тех, кто уже работает с Linux, Proxmox, Ansible, GitLab CI или Kubernetes.' },
+  { q: 'Чем эти курсы отличаются от «курсов с нуля»?', a: 'Большинство курсов линейки не учат установке и основам — они начинаются там, где заканчиваются туториалы: отказоустойчивость, диагностика, поломки в проде и автоматизация.' },
+  { q: 'Есть ли гарантия трудоустройства?', a: 'Нет. Мы даём знания и практику, которые нужны в работе, но не обещаем трудоустройство или доход.' },
+  { q: 'Где следить за новыми курсами?', a: `В Telegram-канале ${SITE.telegramHandle}: там выходят анонсы, разборы и рабочие заметки.` },
+];
+
+const opsdeckHighlights = ['Терминал с блоками команд и AI-панелью', 'Kubernetes, базы данных, SSH и мониторинг хостов', 'Локальная модель через llama.cpp — работает офлайн', 'Linux, Windows и macOS, лицензия MIT'];
+
+const ld = [
+  { '@context': 'https://schema.org', '@type': 'Organization', name: SITE.fullName, url: new URL(url('/'), Astro.site).href, sameAs: [SITE.telegram, SITE.opsdeckRepo] },
+  { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE.fullName, url: new URL(url('/'), Astro.site).href, inLanguage: 'ru' },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+];
+---
+<Base title="OpsOps Expertise — практические курсы по Linux, DevOps и эксплуатации инфраструктуры" description={SITE.description} jsonLd={ld}
+  keywords={['курсы системного администрирования', 'обучение devops', 'курсы linux', 'курс proxmox', 'курс ansible', 'курс gitlab ci', 'курс k3s']}>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="bg-grid"></div>
+    <div class="glow" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <span class="eyebrow">SysOps · DevOps · OpsOps Expertise</span>
+        <h1 class="h1">Практические курсы по эксплуатации <span class="hl">IT-инфраструктуры</span></h1>
+        <p class="lead">От первых команд до инженерной экспертизы: Linux и сеть, виртуализация, автоматизация, CI/CD, Kubernetes и ИИ в эксплуатации. Курсы собраны из реальных инцидентов и рабочих задач и проходятся на Stepik.</p>
+        <div class="hero-cta">
+          <a class="btn btn--primary" href={url('/courses/')}>Смотреть курсы <Icon name="arrow" /></a>
+          <a class="btn" href={url('/paths/')}>Подобрать маршрут</a>
+        </div>
+        <dl class="stats">
+          <div><dt>Курсов на Stepik</dt><dd>{open.length}</dd></div>
+          <div><dt>Уроков в программах</dt><dd>{totalLessons}</dd></div>
+          <div><dt>Практических занятий</dt><dd>{totalPractice}</dd></div>
+        </dl>
+      </div>
+      <div class="hero-visual"><Terminal /></div>
+    </div>
+  </section>
+
+  <!-- ИДЕЯ -->
+  <section class="section section--tight">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">{SITE.slogan}</span>
+        <h2 class="h2">Учим не нажимать кнопки, а понимать, строить и эксплуатировать</h2>
+      </div>
+      <div class="grid grid-3">
+        {pillars.map((p, i) => (
+          <div class="card card--pad pillar reveal" style={`transition-delay:${i * 80}ms`}>
+            <span class="pk mono">0{i + 1} / {p.k}</span>
+            <h3 class="h3">{p.t}</h3>
+            <p class="muted">{p.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- КУРСЫ -->
+  <section class="section section--alt" id="courses">
+    <div class="container">
+      <div class="section-head section-head--row reveal">
+        <div style="display:grid;gap:14px">
+          <span class="eyebrow">Курсы</span>
+          <h2 class="h2">Курсы линейки</h2>
+          <p class="lead">Шесть курсов уже открыты на Stepik, ещё одна программа — в разработке.</p>
+        </div>
+        <a class="btn" href={url('/courses/')}>Весь каталог <Icon name="arrow" /></a>
+      </div>
+      <div class="grid grid-3">
+        {courses.filter((c) => c.featured).map((c) => <div class="reveal"><CourseCard course={c} /></div>)}
+      </div>
+      {soon.map((c) => (
+        <a class="card card--hover soon reveal" href={url(`/courses/${c.slug}/`)}>
+          <span class="tag tag--soon"><span class="dot"></span>В разработке</span>
+          <span class="soon-t">{c.title}</span>
+          <span class="soon-a muted">Анонс — в Telegram <Icon name="arrow" size={15} /></span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- НАПРАВЛЕНИЯ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Направления</span>
+        <h2 class="h2">Что разбираем</h2>
+      </div>
+      <div class="grid grid-3">
+        {directions.map((d) => {
+          const list = courses.filter((c) => c.category === d.name);
+          return (
+            <a class="card card--pad card--hover dir reveal" href={url(`/courses/?category=${encodeURIComponent(d.name)}`)}>
+              <span class="dir-ic"><Icon name={d.icon} size={20} /></span>
+              <h3 class="h3">{d.name}</h3>
+              <p class="muted">{d.text}</p>
+              <span class="dir-n mono">{list.length} {plural(list.length, ['курс', 'курса', 'курсов'])} <Icon name="arrow" size={14} /></span>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- МАРШРУТЫ -->
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-head section-head--row reveal">
+        <div style="display:grid;gap:14px">
+          <span class="eyebrow">Маршруты</span>
+          <h2 class="h2">Рекомендуемый порядок курсов</h2>
+          <p class="lead">Маршруты собраны из существующих курсов. Это подсказка, с чего начать и куда расти, а не «профессия под ключ».</p>
+        </div>
+        <a class="btn" href={url('/paths/')}>Все маршруты <Icon name="arrow" /></a>
+      </div>
+      <div class="grid grid-3">
+        {paths.map((p, i) => (
+          <a class="card card--pad card--hover path reveal" href={url(`/paths/#${p.slug}`)}>
+            <span class="pk mono">route/{String(i + 1).padStart(2, '0')}</span>
+            <h3 class="h3">{p.title}</h3>
+            <p class="muted small">Старт: {p.startLevel}</p>
+            <ol class="steps">
+              {p.steps.map((s) => {
+                const c = getCourse(s.course)!;
+                return <li><span class:list={['sd', c.status]}></span>{c.shortTitle}{c.status === 'soon' && <em> — скоро</em>}</li>;
+              })}
+            </ol>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ПОЧЕМУ -->
+  <section class="section">
+    <div class="container why">
+      <div class="section-head reveal">
+        <span class="eyebrow">Подход</span>
+        <h2 class="h2">Почему стоит учиться здесь</h2>
+        <p class="lead">Мы не продаём видеолекции. Это курсы инженера-практика для тех, кто работает с инфраструктурой руками.</p>
+      </div>
+      <div class="grid grid-2">
+        {reasons.map((r, i) => (
+          <div class="card card--pad reason reveal">
+            <span class="rn mono">{String(i + 1).padStart(2, '0')}</span>
+            <div><h3 class="h3">{r.t}</h3><p class="muted">{r.d}</p></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ФИЛОСОФИЯ -->
+  <section class="section section--tight">
+    <div class="container">
+      <div class="manifest card reveal">
+        <div class="bg-grid"></div>
+        <div class="manifest-inner">
+          <span class="eyebrow">Инженерная философия</span>
+          <blockquote>
+            <p>Курс начинается там, где заканчивается туториал по установке.</p>
+          </blockquote>
+          <div class="incident mono" aria-label="Пример разбора">
+            <p><span class="k">symptom</span> kubectl get nodes → NotReady</p>
+            <p><span class="k">diagnose</span> связность или состояние ноды? LTE пропала на 40 секунд</p>
+            <p><span class="k">fix</span> tolerationSeconds под реальные обрывы, а не дефолтные 300</p>
+            <p class="ok">✓ поды не пересоздаются каскадом</p>
+          </div>
+          <p class="muted small">Пример из курса «K3s для IoT»: так устроены разборы во всей линейке.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPSDECK -->
+  <section class="section section--alt">
+    <div class="container opsdeck">
+      <div class="od-text reveal">
+        <span class="eyebrow">Open-source продукт</span>
+        <h2 class="h2">OpsDeck — рабочее место DevOps-инженера в одном окне</h2>
+        <p class="lead">Отдельный проект автора: терминал с AI-панелью, Kubernetes, базы данных, SSH, алерты, заметки и KeePass в нативном приложении.</p>
+        <ul class="checklist">{opsdeckHighlights.map((h) => <li>{h}</li>)}</ul>
+        <div class="hero-cta">
+          <a class="btn btn--primary" href={url('/opsdeck/')}>Подробнее об OpsDeck <Icon name="arrow" /></a>
+          <a class="btn" href={SITE.opsdeckRepo} target="_blank" rel="noopener" data-track="opsdeck" data-track-place="home"><Icon name="github" /> GitHub</a>
+        </div>
+      </div>
+      <figure class="od-shot reveal">
+        <img src={url('/images/opsdeck/terminal.webp')} alt="Интерфейс OpsDeck: терминал с блоками команд и AI-панелью" width="1440" height="900" loading="lazy" decoding="async" />
+      </figure>
+    </div>
+  </section>
+
+  <!-- TELEGRAM -->
+  <section class="section">
+    <div class="container"><TelegramBlock place="home" /></div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section--alt">
+    <div class="container faq-wrap">
+      <div class="section-head">
+        <span class="eyebrow">FAQ</span>
+        <h2 class="h2">Частые вопросы</h2>
+      </div>
+      <Faq items={faq} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { position: relative; padding-block: clamp(56px, 9vw, 120px) clamp(56px, 8vw, 104px); overflow: hidden; }
+  .glow { position: absolute; width: 900px; height: 600px; right: -200px; top: -200px; background: radial-gradient(closest-side, rgb(45 212 191 / 0.1), transparent); pointer-events: none; }
+  .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.08fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+  .hero-text { display: grid; gap: 22px; }
+  .hl { color: var(--teal); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 0; margin: 14px 0 0; border: 1px solid var(--line); border-radius: 12px; background: rgb(17 24 33 / 0.6); width: fit-content; max-width: 100%; }
+  .stats div { padding: 14px 22px; border-left: 1px solid var(--line); }
+  .stats div:first-child { border-left: 0; }
+  .stats dt { font-size: 12.5px; color: var(--muted); }
+  .stats dd { margin: 2px 0 0; font-family: var(--mono); font-size: 24px; font-weight: 600; color: var(--text); }
+  @media (max-width: 960px) { .hero-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .stats div { padding: 12px 14px; } .stats dd { font-size: 20px; } }
+
+  .pillar { display: grid; gap: 12px; align-content: start; }
+  .pk { font-size: 12px; color: var(--teal); letter-spacing: 0.06em; }
+
+  .dir { display: grid; gap: 10px; align-content: start; }
+  .dir-ic { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--teal-dim); color: var(--teal); border: 1px solid rgb(45 212 191 / 0.2); margin-bottom: 4px; }
+  .dir-n { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-2); margin-top: 6px; }
+
+  .path { display: grid; gap: 12px; align-content: start; }
+  .small { font-size: 14px; }
+  .steps { list-style: none; display: grid; gap: 0; margin-top: 6px; border-left: 1px dashed var(--line-2); margin-left: 5px; }
+  .steps li { position: relative; padding: 7px 0 7px 18px; font-weight: 550; font-size: 15px; }
+  .steps em { color: var(--amber); font-style: normal; font-weight: 500; font-size: 13.5px; }
+  .sd { position: absolute; left: -5.5px; top: 14px; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 3px var(--bg-2); }
+  .sd.soon { background: var(--amber); }
+
+  .reason { display: grid; grid-template-columns: auto 1fr; gap: 18px; }
+  .reason .h3 { margin-bottom: 8px; }
+  .rn { font-size: 13px; color: var(--teal); padding-top: 3px; }
+
+  .manifest { overflow: hidden; padding: clamp(28px, 5vw, 64px); }
+  .manifest-inner { position: relative; z-index: 1; display: grid; gap: 22px; max-width: 820px; }
+  blockquote { margin: 0; }
+  blockquote p { font-size: clamp(26px, 3.4vw, 40px); font-weight: 620; letter-spacing: -0.03em; line-height: 1.15; }
+  .incident { display: grid; gap: 8px; padding: 18px 20px; border-radius: 12px; border: 1px solid var(--line); background: rgb(10 14 19 / 0.6); font-size: 13.5px; color: var(--text-2); }
+  .incident .k { display: inline-block; min-width: 90px; color: var(--blue); }
+  .incident .ok { color: var(--green); }
+
+  .opsdeck { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
+  .od-text { display: grid; gap: 20px; }
+  .od-shot { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line-2); box-shadow: 0 40px 80px -40px rgb(0 0 0 / 0.9); }
+  @media (max-width: 960px) { .opsdeck { grid-template-columns: 1fr; } }
+
+  .faq-wrap { max-width: 860px; }
+  .soon { margin-top: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; padding: 18px 22px; }
+  .soon-t { font-weight: 620; font-size: 17px; }
+  .soon-a { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 14.5px; }
+</style>

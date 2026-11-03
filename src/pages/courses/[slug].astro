@@ -1,0 +1,276 @@
+---
+import Base from '../../layouts/Base.astro';
+import CourseCover from '../../components/CourseCover.astro';
+import CourseCard from '../../components/CourseCard.astro';
+import Faq from '../../components/Faq.astro';
+import Icon from '../../components/Icon.astro';
+import { courses, stepikUrl, lessonCount, practiceLessons, contentLessons } from '../../data/courses';
+import { paths } from '../../data/paths';
+import { LEVEL_LABEL, STATUS_LABEL, type Course } from '../../data/types';
+import { SITE } from '../../data/site';
+import { url, plural, formatDateRu } from '../../lib/url';
+
+export function getStaticPaths() {
+  return courses.map((c) => ({ params: { slug: c.slug }, props: { course: c } }));
+}
+const { course: c } = Astro.props as { course: Course };
+const stepik = stepikUrl(c);
+const n = lessonCount(c);
+const practice = practiceLessons(c);
+const inPaths = paths.filter((p) => p.steps.some((s) => s.course === c.slug));
+const related = courses.filter((x) => x.slug !== c.slug && inPaths.some((p) => p.steps.some((s) => s.course === x.slug))).slice(0, 3);
+const pageUrl = new URL(url(`/courses/${c.slug}/`), Astro.site).href;
+
+const ld: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org', '@type': 'Course',
+    name: c.title, description: c.summary, inLanguage: 'ru', url: pageUrl,
+    provider: { '@type': 'Organization', name: SITE.fullName, sameAs: SITE.telegram },
+    ...(c.price && stepik ? {
+      offers: { '@type': 'Offer', category: 'Paid', price: c.price.replace(/[^\d.]/g, ''), priceCurrency: 'RUB', url: stepik },
+      hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: c.workload ?? undefined },
+    } : {}),
+    ...(c.skills.length ? { teaches: c.skills } : {}),
+  },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: new URL(url('/'), Astro.site).href },
+    { '@type': 'ListItem', position: 2, name: 'Курсы', item: new URL(url('/courses/'), Astro.site).href },
+    { '@type': 'ListItem', position: 3, name: c.shortTitle, item: pageUrl },
+  ] },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: c.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
+];
+---
+<Base title={c.seo.title} description={c.seo.description} keywords={c.seo.keywords} image={`/og/${c.slug}.png`} jsonLd={ld}>
+  <section class="c-hero">
+    <div class="bg-grid"></div>
+    <div class="container c-hero-grid">
+      <div class="c-hero-text">
+        <nav class="crumbs" aria-label="Хлебные крошки">
+          <a href={url('/')}>главная</a><span aria-hidden="true">/</span><a href={url('/courses/')}>курсы</a><span aria-hidden="true">/</span><span>{c.slug}</span>
+        </nav>
+        <div class="chips">
+          <span class:list={['tag', `tag--${c.status}`]}><span class="dot"></span>{STATUS_LABEL[c.status]}</span>
+          <span class="tag">{c.category}</span>
+          <span class="tag">Уровень: {LEVEL_LABEL[c.level]}</span>
+        </div>
+        <h1 class="h1 c-title">{c.title}</h1>
+        <p class="c-headline">{c.headline}</p>
+        <p class="lead">{c.summary}</p>
+        <div class="c-cta">
+          {stepik ? (
+            <a class="btn btn--primary" href={stepik} target="_blank" rel="noopener" data-track="stepik" data-track-course={c.slug} data-track-place="hero">
+              Перейти на Stepik <Icon name="external" />
+            </a>
+          ) : (
+            <a class="btn btn--primary" href={SITE.telegram} target="_blank" rel="noopener" data-track="telegram" data-track-course={c.slug} data-track-place="hero">
+              <Icon name="telegram" /> Следить за анонсом
+            </a>
+          )}
+          {n > 0 && <a class="btn" href="#program">Программа</a>}
+        </div>
+      </div>
+      <div class="c-hero-side">
+        <CourseCover course={c} size="hero" />
+        <dl class="facts">
+          {c.price && <div><dt>Цена на Stepik</dt><dd>{c.price}</dd></div>}
+          {c.workload && <div><dt>Нагрузка</dt><dd>{c.workload}</dd></div>}
+          {n > 0 && <div><dt>Программа</dt><dd>{c.modules.length} {plural(c.modules.length, ['модуль','модуля','модулей'])} · {n} {plural(n, ['урок','урока','уроков'])}</dd></div>}
+          {practice.length > 0 && <div><dt>Практика</dt><dd>{practice.length} {plural(practice.length, ['занятие','занятия','занятий'])}{c.hasFinalProject ? ' + проект' : ''}</dd></div>}
+        </dl>
+        {c.price && <p class="note muted">Цена сверена со Stepik {formatDateRu(SITE.dataCheckedAt)}</p>}
+      </div>
+    </div>
+  </section>
+
+  <div class="container c-body">
+    <div class="c-main">
+      <section class="block" aria-labelledby="about">
+        <h2 class="h2 bh" id="about">О курсе</h2>
+        <div class="prose">{c.description.map((p) => <p>{p}</p>)}</div>
+      </section>
+
+      <section class="block" aria-labelledby="audience">
+        <h2 class="h2 bh" id="audience">Для кого курс</h2>
+        <div class="card card--pad"><p class="text-2">{c.audience}</p></div>
+      </section>
+
+      {c.skills.length > 0 && (
+        <section class="block" aria-labelledby="skills">
+          <h2 class="h2 bh" id="skills">Чему вы научитесь</h2>
+          <ul class="checklist two">{c.skills.map((s) => <li>{s}</li>)}</ul>
+        </section>
+      )}
+
+      {c.modules.length > 0 && (
+        <section class="block" aria-labelledby="program" id="program">
+          <h2 class="h2 bh">Программа</h2>
+          <p class="muted sub">Структура курса на Stepik: {c.modules.length} {plural(c.modules.length, ['модуль','модуля','модулей'])}{c.hasFinalProject ? ' и финальный проект' : ''}.</p>
+          <ol class="modules">
+            {c.modules.map((m, i) => {
+              const lessons = contentLessons(m);
+              const quiz = m.lessons.length - lessons.length;
+              return (
+                <li>
+                  <details open={i === 0}>
+                    <summary>
+                      <span class="mn mono">{String(i + 1).padStart(2, '0')}</span>
+                      <span class="mt">{m.title}</span>
+                      <span class="mc mono">{lessons.length} {plural(lessons.length, ['урок','урока','уроков'])}{quiz ? ' + тест' : ''}</span>
+                    </summary>
+                    <ul class="lessons">
+                      {m.lessons.map((l) => (
+                        <li class:list={[{ pr: /^(Практика|Итоговый практикум)/.test(l), qz: /^Квиз/.test(l) }]}>
+                          <span class="lk mono">{/^(Практика|Итоговый практикум)/.test(l) ? 'practice' : /^Квиз/.test(l) ? 'quiz' : 'lesson'}</span>
+                          <span>{l}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                </li>
+              );
+            })}
+            {c.hasFinalProject && (
+              <li class="final">
+                <div class="final-in"><span class="mn mono"><Icon name="flag" size={16} /></span><span class="mt">Финальный проект курса</span></div>
+              </li>
+            )}
+          </ol>
+        </section>
+      )}
+
+      {practice.length > 0 && (
+        <section class="block" aria-labelledby="practice">
+          <h2 class="h2 bh" id="practice">Практические задания</h2>
+          <div class="grid grid-2">
+            {practice.map((p) => (
+              <div class="card prac">
+                <Icon name="terminal" />
+                <span>{((t) => t.charAt(0).toUpperCase() + t.slice(1))(p.replace(/^Практика:\s*/, ''))}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {c.technologies.length > 0 && (
+        <section class="block" aria-labelledby="tech">
+          <h2 class="h2 bh" id="tech">Технологии</h2>
+          <div class="chips">{c.technologies.map((t) => <span class="tag tag--mono">{t}</span>)}</div>
+        </section>
+      )}
+
+      {c.requirements.length > 0 && (
+        <section class="block" aria-labelledby="req">
+          <h2 class="h2 bh" id="req">Что нужно знать заранее</h2>
+          <ul class="dashlist">{c.requirements.map((r) => <li>{r}</li>)}</ul>
+        </section>
+      )}
+
+      <section class="block" aria-labelledby="faq">
+        <h2 class="h2 bh" id="faq">Вопросы о курсе</h2>
+        <Faq items={c.faq} />
+      </section>
+    </div>
+
+    <aside class="c-aside">
+      <div class="card card--pad sticky">
+        <p class="as-title">{c.shortTitle}</p>
+        {c.price && <p class="as-price">{c.price}</p>}
+        <p class="muted small">{stepik ? 'Обучение, практика и тесты — на Stepik.' : 'Программа в разработке. Анонс — в Telegram.'}</p>
+        {stepik ? (
+          <a class="btn btn--primary btn--block" href={stepik} target="_blank" rel="noopener" data-track="stepik" data-track-course={c.slug} data-track-place="aside">Перейти на Stepik <Icon name="external" /></a>
+        ) : (
+          <a class="btn btn--primary btn--block" href={SITE.telegram} target="_blank" rel="noopener" data-track="telegram" data-track-course={c.slug} data-track-place="aside"><Icon name="telegram" /> Telegram-канал</a>
+        )}
+        {inPaths.length > 0 && (
+          <div class="as-paths">
+            <p class="mono as-k">входит в маршрут</p>
+            {inPaths.map((p) => <a href={url(`/paths/#${p.slug}`)}><Icon name="route" size={16} /> {p.title}</a>)}
+          </div>
+        )}
+      </div>
+    </aside>
+  </div>
+
+  <section class="section section--alt final-cta">
+    <div class="container fc">
+      <div>
+        <h2 class="h2">{stepik ? 'Готовы начать?' : 'Хотите узнать о старте первым?'}</h2>
+        <p class="lead">{stepik ? 'Откройте курс на Stepik: там полная программа, первые уроки и запись.' : `Анонс выйдет в Telegram-канале ${SITE.telegramHandle}.`}</p>
+      </div>
+      {stepik ? (
+        <a class="btn btn--primary" href={stepik} target="_blank" rel="noopener" data-track="stepik" data-track-course={c.slug} data-track-place="bottom">Перейти на Stepik <Icon name="external" /></a>
+      ) : (
+        <a class="btn btn--primary" href={SITE.telegram} target="_blank" rel="noopener" data-track="telegram" data-track-course={c.slug} data-track-place="bottom"><Icon name="telegram" /> Открыть канал</a>
+      )}
+    </div>
+  </section>
+
+  {related.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><span class="eyebrow">Дальше по маршруту</span><h2 class="h2">Связанные курсы</h2></div>
+        <div class="grid grid-3">{related.map((r) => <CourseCard course={r} />)}</div>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .c-hero { position: relative; overflow: hidden; padding-block: clamp(40px, 6vw, 80px); border-bottom: 1px solid var(--line); }
+  .c-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.35fr 1fr; gap: clamp(28px, 5vw, 64px); align-items: start; }
+  .c-hero-text { display: grid; gap: 18px; }
+  .c-title { font-size: clamp(30px, 4.2vw, 50px); }
+  .c-headline { font-size: clamp(18px, 1.8vw, 21px); font-weight: 560; color: var(--teal); line-height: 1.4; }
+  .c-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
+  .c-hero-side { display: grid; gap: 14px; }
+  .facts { margin: 0; display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+  .facts div { padding: 14px 16px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin: -1px 0 0 -1px; }
+  .facts dt { font-size: 12.5px; color: var(--muted); }
+  .facts dd { margin: 3px 0 0; font-weight: 620; }
+  .note { font-size: 12.5px; }
+  @media (max-width: 960px) { .c-hero-grid { grid-template-columns: 1fr; } .c-hero-side { max-width: 560px; } }
+
+  .c-body { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: clamp(28px, 4vw, 56px); padding-block: clamp(40px, 6vw, 72px); }
+  .c-main { display: grid; gap: clamp(44px, 5vw, 64px); min-width: 0; }
+  .block { display: grid; gap: 18px; }
+  .bh { font-size: clamp(24px, 2.6vw, 32px); }
+  .sub { margin-top: -6px; }
+  .prose { display: grid; gap: 14px; color: var(--text-2); font-size: 17px; max-width: 72ch; }
+  .text-2 { color: var(--text-2); }
+  .checklist.two { grid-template-columns: 1fr 1fr; column-gap: 28px; row-gap: 14px; }
+  @media (max-width: 720px) { .checklist.two { grid-template-columns: 1fr; } }
+
+  .modules { list-style: none; display: grid; gap: 10px; }
+  .modules details { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  .modules details[open] { border-color: var(--line-2); }
+  .modules summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 36px 1fr auto; gap: 14px; align-items: center; padding: 16px 18px; }
+  .modules summary::-webkit-details-marker { display: none; }
+  .mn { color: var(--teal); font-size: 13px; display: inline-flex; }
+  .mt { font-weight: 620; font-size: 16.5px; }
+  .mc { font-size: 12px; color: var(--muted); }
+  .lessons { list-style: none; padding: 0 18px 16px 68px; display: grid; gap: 2px; }
+  .lessons li { display: grid; grid-template-columns: 72px 1fr; gap: 10px; padding: 7px 0; border-top: 1px dashed var(--line); color: var(--text-2); font-size: 15px; }
+  .lk { font-size: 11px; color: var(--muted); padding-top: 3px; }
+  .lessons li.pr .lk { color: var(--green); }
+  .lessons li.qz .lk { color: var(--blue); }
+  .final .final-in { display: grid; grid-template-columns: 36px 1fr; gap: 14px; align-items: center; padding: 16px 18px; border-radius: 12px; border: 1px dashed rgb(45 212 191 / 0.4); background: var(--teal-dim); }
+  @media (max-width: 560px) { .modules summary { grid-template-columns: 28px 1fr; } .mc { grid-column: 2; } .lessons { padding-left: 18px; } .lessons li { grid-template-columns: 1fr; gap: 0; } }
+
+  .prac { display: flex; gap: 12px; align-items: flex-start; padding: 16px 18px; color: var(--text-2); }
+  .prac :global(svg) { color: var(--green); flex: none; margin-top: 3px; }
+
+  .c-aside { position: relative; }
+  .sticky { position: sticky; top: 92px; display: grid; gap: 14px; }
+  .as-title { font-weight: 650; font-size: 17px; }
+  .as-price { font-family: var(--mono); font-size: 30px; font-weight: 600; }
+  .small { font-size: 14px; }
+  .as-paths { display: grid; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .as-k { font-size: 11.5px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  .as-paths a { display: flex; align-items: center; gap: 8px; font-size: 14.5px; color: var(--text-2); }
+  .as-paths a:hover { color: var(--teal); }
+  @media (max-width: 960px) { .c-body { grid-template-columns: 1fr; } .c-aside { order: -1; display: none; } }
+
+  .fc { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; }
+  .fc > div { display: grid; gap: 10px; max-width: 640px; }
+</style>

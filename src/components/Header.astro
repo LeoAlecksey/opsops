@@ -1,0 +1,82 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { url } from '../lib/url';
+import { SITE } from '../data/site';
+
+const nav = [
+  { href: '/courses/', label: 'Курсы' },
+  { href: '/paths/', label: 'Маршруты' },
+  { href: '/opsdeck/', label: 'OpsDeck' },
+  { href: '/community/', label: 'Сообщество' },
+];
+const path = Astro.url.pathname;
+const isActive = (href: string) => path.startsWith(url(href));
+---
+<header class="site-header">
+  <div class="container bar">
+    <a href={url('/')} class="brand" aria-label="OpsOps Expertise — на главную"><Logo /></a>
+    <nav class="nav" aria-label="Основная навигация">
+      <ul>
+        {nav.map((n) => (
+          <li><a href={url(n.href)} aria-current={isActive(n.href) ? 'page' : undefined}>{n.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <div class="actions">
+      <a class="btn btn--sm btn--ghost tg" href={SITE.telegram} target="_blank" rel="noopener" data-track="telegram" data-track-place="header">
+        <Icon name="telegram" size={16} /><span>Telegram</span>
+      </a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Меню">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-nav" id="mobile-nav" hidden>
+    <ul class="container">
+      {nav.map((n) => <li><a href={url(n.href)}>{n.label}</a></li>)}
+      <li><a href={SITE.telegram} target="_blank" rel="noopener" data-track="telegram" data-track-place="mobile-menu">Telegram-канал <Icon name="external" size={15} /></a></li>
+    </ul>
+  </div>
+</header>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('.menu-btn');
+  const panel = document.getElementById('mobile-nav');
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!open));
+    if (panel) panel.hidden = open;
+    document.body.classList.toggle('menu-open', !open);
+  });
+</script>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgb(10 14 19 / 0.78);
+    backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 24px; height: 68px; }
+  .nav ul { list-style: none; display: flex; gap: 4px; }
+  .nav a { display: block; padding: 8px 14px; border-radius: 8px; color: var(--text-2); font-size: 15px; font-weight: 500; transition: color 0.15s, background 0.15s; }
+  .nav a:hover { color: var(--text); background: rgb(148 178 208 / 0.06); }
+  .nav a[aria-current='page'] { color: var(--text); background: rgb(148 178 208 / 0.08); }
+  .actions { display: flex; align-items: center; gap: 10px; }
+  .menu-btn { display: none; width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--surface); cursor: pointer; position: relative; }
+  .menu-btn span { position: absolute; left: 12px; right: 12px; height: 1.8px; background: var(--text); border-radius: 2px; transition: transform 0.2s, top 0.2s; }
+  .menu-btn span:first-child { top: 16px; }
+  .menu-btn span:last-child { top: 24px; }
+  .menu-btn[aria-expanded='true'] span:first-child { top: 20px; transform: rotate(45deg); }
+  .menu-btn[aria-expanded='true'] span:last-child { top: 20px; transform: rotate(-45deg); }
+  .mobile-nav { border-top: 1px solid var(--line); background: var(--bg); }
+  .mobile-nav ul { list-style: none; display: grid; padding-block: 8px 16px; }
+  .mobile-nav a { display: flex; align-items: center; gap: 8px; padding: 14px 0; font-size: 18px; font-weight: 550; border-bottom: 1px solid var(--line); }
+  @media (max-width: 860px) {
+    .nav, .tg { display: none; }
+    .menu-btn { display: block; }
+  }
+  @media (min-width: 861px) { .mobile-nav { display: none; } }
+</style>

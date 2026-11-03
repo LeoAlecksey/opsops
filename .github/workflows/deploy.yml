@@ -1,0 +1,83 @@
+# Сборка и публикация сайта на GitHub Pages.
+#
+# Адрес сайта:
+#   • Пока домена нет — сайт публикуется на https://<owner>.github.io/<repo>/
+#   • Когда домен выбран — в Settings → Secrets and variables → Actions → Variables
+#     создайте переменную CUSTOM_DOMAIN (например: opsops.ru). Сборка сама
+#     переключит base path на "/", а в артефакт добавится файл CNAME.
+#   • Опционально: YANDEX_METRIKA_ID — номер счётчика Метрики (цели stepik_click, telegram_click, opsdeck_click).
+#   • Опционально: ROBOTS_DISALLOW=1 — закрыть сайт от индексации (например, пока идёт проверка).
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Resolve site URL and base path
+        id: site
+        env:
+          CUSTOM_DOMAIN: ${{ vars.CUSTOM_DOMAIN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          if [ -n "$CUSTOM_DOMAIN" ]; then
+            echo "url=https://$CUSTOM_DOMAIN" >> "$GITHUB_OUTPUT"
+            echo "base=/" >> "$GITHUB_OUTPUT"
+          elif [ "${REPO,,}" = "${OWNER,,}.github.io" ]; then
+            echo "url=https://${OWNER,,}.github.io" >> "$GITHUB_OUTPUT"
+            echo "base=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "url=https://${OWNER,,}.github.io" >> "$GITHUB_OUTPUT"
+            echo "base=/$REPO/" >> "$GITHUB_OUTPUT"
+          fi
+
+      - run: npm ci
+
+      - name: Build
+        env:
+          SITE_URL: ${{ steps.site.outputs.url }}
+          BASE_PATH: ${{ steps.site.outputs.base }}
+          PUBLIC_YANDEX_METRIKA_ID: ${{ vars.YANDEX_METRIKA_ID }}
+          ROBOTS_DISALLOW: ${{ vars.ROBOTS_DISALLOW }}
+        run: npm run build
+
+      - name: Add CNAME for custom domain
+        if: ${{ vars.CUSTOM_DOMAIN != '' }}
+        run: echo "${{ vars.CUSTOM_DOMAIN }}" > dist/CNAME
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
