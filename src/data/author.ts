@@ -3,7 +3,7 @@
  * Показывается на главной (полная версия) и на страницах курсов (короткая).
  */
 export const AUTHOR = {
-  name: 'Алекс',
+  name: 'Алексей Андреев',
   role: 'DevOps / Infrastructure Engineer',
   /** Путь к фото в public/, например /images/author.webp. Пусто — показывается монограмма. */
   photo: '',
