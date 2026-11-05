@@ -15,6 +15,8 @@ export interface Course {
   stepikId: number | null;
   /** Своя ссылка на Stepik (например короткая stepik.org/a/<id>); по умолчанию /course/<id>/promo */
   stepikLink?: string;
+  /** Промокод: показывается до даты until включительно (скрывается и при сборке, и в браузере) */
+  promo?: { code: string; percent: number; price: string; until: string };
   /** open — открыт для записи; soon — готовится или ещё не опубликован на Stepik (ссылка на Stepik не показывается); private — закрытый, приглашения не публикуем */
   status: CourseStatus;
   /** Порядок в каталоге */

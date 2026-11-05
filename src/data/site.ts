@@ -14,5 +14,5 @@ export const SITE = {
   opsdeckRepo: 'https://github.com/LeoAlecksey/opsdeck',
   opsdeckSite: 'https://leoalecksey.github.io/opsdeck/',
   /** Дата, на которую сверены цены и программы с Stepik */
-  dataCheckedAt: '2026-11-03',
+  dataCheckedAt: '2026-11-05',
 } as const;

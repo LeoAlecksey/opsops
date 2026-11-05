@@ -1,0 +1,32 @@
+---
+import type { Course } from '../data/types';
+import { activePromo } from '../data/courses';
+import { formatDateRu } from '../lib/url';
+interface Props { course: Course; variant?: 'hero' | 'card' }
+const { course, variant = 'hero' } = Astro.props;
+const p = activePromo(course);
+---
+{p && (
+  <div class:list={['promo', `promo--${variant}`]} data-until={p.until}>
+    {variant === 'hero' ? (
+      <>
+        <span class="pr-off mono">−{p.percent}%</span>
+        <span class="pr-txt">по промокоду <b class="mono">{p.code}</b> — <b>{p.price}</b> вместо {course.price} · до {formatDateRu(p.until)}</span>
+      </>
+    ) : (
+      <span class="pr-txt"><b class="mono">{p.code}</b> −{p.percent}% до {formatDateRu(p.until).replace(/ г\.$/, '')}</span>
+    )}
+  </div>
+)}
+<script>
+  document.querySelectorAll<HTMLElement>('.promo[data-until]').forEach((el) => {
+    if (new Date(el.dataset.until + 'T23:59:59+03:00') < new Date()) el.remove();
+  });
+</script>
+<style>
+  .promo { display: flex; align-items: center; gap: 12px; border-radius: 12px; border: 1px dashed rgb(242 180 90 / 0.55); background: var(--amber-dim); color: #f6d5a3; }
+  .promo--hero { padding: 12px 16px; font-size: 15px; line-height: 1.4; }
+  .promo--card { padding: 6px 10px; font-size: 12.5px; border-radius: 9px; width: fit-content; }
+  .pr-off { flex: none; font-weight: 700; font-size: 18px; color: var(--amber); }
+  .promo b { color: var(--text); }
+</style>

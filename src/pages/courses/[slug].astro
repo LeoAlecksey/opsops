@@ -5,6 +5,7 @@ import CourseCard from '../../components/CourseCard.astro';
 import Faq from '../../components/Faq.astro';
 import Icon from '../../components/Icon.astro';
 import AuthorBlock from '../../components/AuthorBlock.astro';
+import PromoBadge from '../../components/PromoBadge.astro';
 import { courses, stepikUrl, lessonCount, practiceLessons, contentLessons, lessonKind } from '../../data/courses';
 import { paths } from '../../data/paths';
 import { LEVEL_LABEL, STATUS_LABEL, type Course } from '../../data/types';
@@ -57,6 +58,7 @@ const ld: Record<string, unknown>[] = [
         <h1 class="h1 c-title">{c.title}</h1>
         <p class="c-headline">{c.headline}</p>
         <p class="lead">{c.summary}</p>
+        <PromoBadge course={c} />
         <div class="c-cta">
           {stepik ? (
             <a class="btn btn--primary" href={stepik} target="_blank" rel="noopener" data-track="stepik" data-track-course={c.slug} data-track-place="hero">
@@ -184,6 +186,7 @@ const ld: Record<string, unknown>[] = [
       <div class="card card--pad sticky">
         <p class="as-title">{c.shortTitle}</p>
         {c.price && <p class="as-price">{c.price}</p>}
+        <PromoBadge course={c} variant="card" />
         <p class="muted small">{stepik ? 'Обучение, практика и тесты — на Stepik.' : 'Запись скоро откроется. Анонс — в Telegram.'}</p>
         {stepik ? (
           <a class="btn btn--primary btn--block" href={stepik} target="_blank" rel="noopener" data-track="stepik" data-track-course={c.slug} data-track-place="aside">Перейти на Stepik <Icon name="external" /></a>

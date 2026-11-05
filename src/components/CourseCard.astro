@@ -5,6 +5,7 @@ import { url, plural } from '../lib/url';
 import { lessonCount } from '../data/courses';
 import CourseCover from './CourseCover.astro';
 import Icon from './Icon.astro';
+import PromoBadge from './PromoBadge.astro';
 interface Props { course: Course; headingLevel?: 'h2' | 'h3' }
 const { course: c, headingLevel = 'h3' } = Astro.props;
 const H = headingLevel;
@@ -22,6 +23,7 @@ const n = lessonCount(c);
     </div>
     <H class="title">{c.title}</H>
     <p class="summary">{c.headline}</p>
+    <PromoBadge course={c} variant="card" />
     <div class="foot">
       <span class="facts mono">
         {n > 0 ? <span>{c.modules.length} {plural(c.modules.length, ['модуль','модуля','модулей'])} · {n} {plural(n, ['урок','урока','уроков'])}</span> : <span>программа готовится</span>}

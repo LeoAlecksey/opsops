@@ -31,3 +31,7 @@ export const practiceLessons = (c: Course) =>
 /** Уроки без тестов — для подсчёта «теория + практика» */
 export const contentLessons = (m: { lessons: string[] }) =>
   m.lessons.filter((l) => lessonKind(l) !== 'quiz');
+
+/** Промокод активен на момент сборки (дата until включительно, по Москве) */
+export const activePromo = (c: Course) =>
+  c.promo && new Date(c.promo.until + 'T23:59:59+03:00') >= new Date() ? c.promo : null;
