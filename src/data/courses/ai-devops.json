@@ -1,7 +1,7 @@
 {
   "slug": "ai-devops",
   "stepikId": 300064,
-  "status": "soon",
+  "status": "open",
   "order": 7,
   "featured": true,
   "title": "ИИ в DevOps: локальные модели и агенты для инфраструктуры",
