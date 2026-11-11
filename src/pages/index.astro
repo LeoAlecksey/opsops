@@ -106,7 +106,7 @@ const ld = [
         <div style="display:grid;gap:14px">
           <span class="eyebrow">Курсы</span>
           <h2 class="h2">Курсы линейки</h2>
-          <p class="lead">Семь курсов на Stepik — от первой профессии в поддержке до DevOps-эксплуатации.</p>
+          <p class="lead">{open.length} {plural(open.length, ['курс открыт', 'курса открыты', 'курсов открыто'])} для записи на Stepik — от первой профессии в поддержке до ИИ в эксплуатации. Остальные готовим к повторному открытию.</p>
         </div>
         <a class="btn" href={url('/courses/')}>Весь каталог <Icon name="arrow" /></a>
       </div>
