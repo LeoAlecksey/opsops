@@ -36,11 +36,15 @@ export interface Course {
   level: CourseLevel;
   /** Цена на Stepik на дату SITE.dataCheckedAt, строкой как на Stepik */
   price: string | null;
+  /** Per-course date when its price was confirmed, if it differs from SITE.dataCheckedAt */
+  priceCheckedAt?: string;
   workload: string | null;
   audience: string;
   requirements: string[];
   skills: string[];
   technologies: string[];
+  /** Number of modules currently available to learners on Stepik */
+  openModules?: number;
   modules: CourseModule[];
   hasFinalProject: boolean;
   /** Обложка генерируется из глифа и акцента */

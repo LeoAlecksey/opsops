@@ -5,7 +5,7 @@ export const SITE = {
   slogan: 'LEARN. BUILD. OPERATE.',
   tagline: 'Практическое IT-образование: от первых команд до инженерной экспертизы',
   description:
-    'Практические курсы по системному администрированию, Linux, DevOps и эксплуатации инфраструктуры: Proxmox VE, Ansible, GitLab CI, K3s, ИИ в DevOps и старт карьеры в IT через техподдержку.',
+    'Практические курсы по системному администрированию, Linux, DevOps и эксплуатации инфраструктуры: старт в IT через техподдержку и Linux-администрирование, Proxmox VE, Ansible, GitLab CI, K3s и ИИ в DevOps.',
   lang: 'ru',
   locale: 'ru_RU',
   telegram: 'https://t.me/sys_admin_expert',
