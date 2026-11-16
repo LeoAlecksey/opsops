@@ -38,6 +38,8 @@ export interface Course {
   price: string | null;
   /** Per-course date when its price was confirmed, if it differs from SITE.dataCheckedAt */
   priceCheckedAt?: string;
+  /** Date this course landing page was last meaningfully updated, for sitemap <lastmod>. */
+  updatedAt?: string;
   workload: string | null;
   audience: string;
   requirements: string[];

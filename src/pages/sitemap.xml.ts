@@ -4,10 +4,13 @@ import { SITE } from '../data/site';
 
 export const GET: APIRoute = ({ site }) => {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-  const pages = ['/', '/courses/', '/paths/', '/opsdeck/', '/community/', ...courses.map((c) => `/courses/${c.slug}/`)];
+  const pages = [
+    ...['/', '/courses/', '/paths/', '/opsdeck/', '/community/'].map((path) => ({ path, lastmod: SITE.dataCheckedAt })),
+    ...courses.map((course) => ({ path: `/courses/${course.slug}/`, lastmod: course.updatedAt ?? SITE.dataCheckedAt })),
+  ];
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages.map((p) => `  <url><loc>${new URL(base + p, site).href}</loc><lastmod>${SITE.dataCheckedAt}</lastmod></url>`).join('\n')}
+${pages.map(({ path, lastmod }) => `  <url><loc>${new URL(base + path, site).href}</loc><lastmod>${lastmod}</lastmod></url>`).join('\n')}
 </urlset>`;
   return new Response(body, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
 };
