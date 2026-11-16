@@ -27,6 +27,10 @@ const ld: Record<string, unknown>[] = [
   {
     '@context': 'https://schema.org', '@type': 'Course',
     name: c.title, description: c.summary, inLanguage: 'ru', url: pageUrl,
+    sameAs: stepik ? [stepik] : undefined,
+    educationalLevel: LEVEL_LABEL[c.level],
+    audience: { '@type': 'Audience', audienceType: c.audience },
+    coursePrerequisites: c.requirements,
     provider: { '@type': 'Organization', name: SITE.fullName, sameAs: SITE.telegram },
     ...(c.price && stepik ? {
       offers: { '@type': 'Offer', category: 'Paid', price: c.price.replace(/[^\d.]/g, ''), priceCurrency: 'RUB', url: stepik },
@@ -48,7 +52,7 @@ const ld: Record<string, unknown>[] = [
     <div class="container c-hero-grid">
       <div class="c-hero-text">
         <nav class="crumbs" aria-label="Хлебные крошки">
-          <a href={url('/')}>главная</a><span aria-hidden="true">/</span><a href={url('/courses/')}>курсы</a><span aria-hidden="true">/</span><span>{c.slug}</span>
+          <a href={url('/')}>главная</a><span aria-hidden="true">/</span><a href={url('/courses/')}>курсы</a><span aria-hidden="true">/</span><span>{c.shortTitle}</span>
         </nav>
         <div class="chips">
           <span class:list={['tag', `tag--${c.status}`]}><span class="dot"></span>{STATUS_LABEL[c.status]}</span>

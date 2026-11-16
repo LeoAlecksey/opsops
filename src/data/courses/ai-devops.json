@@ -250,16 +250,19 @@
     "accent": "cyan"
   },
   "seo": {
-    "title": "Курс «ИИ в DevOps»: локальные модели и агенты для инфраструктуры",
-    "description": "Локальная LLM на своём сервере (Ollama, llama.cpp) и агенты на Python — LangChain, LangGraph, CrewAI — с доступом к Kubernetes, GitLab и серверам только на чтение. RAG по runbook’ам, безопасность, 32 лабораторные.",
+    "title": "ИИ в DevOps: курс по локальным LLM и агентам | OpsOps",
+    "description": "Практический курс по ИИ в DevOps: локальные LLM на Ollama и llama.cpp, Python-агенты для Kubernetes и GitLab, RAG по runbook’ам, безопасность инфраструктуры и 32 лабораторные.",
     "keywords": [
-      "ии для devops",
+      "курс по ИИ в DevOps",
+      "ИИ для DevOps",
+      "локальные LLM",
       "локальная llm",
       "ollama",
       "langgraph",
-      "ии агент для инфраструктуры",
-      "rag runbook",
-      "llm для системного администратора"
+      "ИИ-агент для инфраструктуры",
+      "RAG по runbook",
+      "LLM для системного администратора",
+      "локальная нейросеть для DevOps"
     ]
   },
   "faq": [

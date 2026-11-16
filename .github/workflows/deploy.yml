@@ -27,6 +27,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      site_url: ${{ steps.site.outputs.url }}
+      base_path: ${{ steps.site.outputs.base }}
     steps:
       - uses: actions/checkout@v4
 
@@ -79,5 +82,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+
       - id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Notify IndexNow about the AI DevOps course page
+        env:
+          SITE_URL: ${{ needs.build.outputs.site_url }}
+          BASE_PATH: ${{ needs.build.outputs.base_path }}
+        run: node .github/scripts/notify-indexnow.mjs
